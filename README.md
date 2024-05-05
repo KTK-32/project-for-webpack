@@ -1,1 +1,1 @@
-# project-for-webpack
+# tetris-from-TS-and-React
