@@ -4,14 +4,17 @@ export function Generate2DArray (m: number, n: number, val: number = 0) {
 
 export function Visualize2DArray (array2D: number[][]) {
   let mapped: string = "";
-
+  const list = [];
   array2D.forEach((value) => {
     value.forEach(value => {
       mapped = mapped + value
     });
-
-    mapped = mapped + "\n";
+    // mapped = mapped + "<\\div>";
+    list.push(mapped);
+    list.push(<br>);
+    // list.push(mapped)+list.push(<br>);
+    mapped = "";
   });
 
-  return mapped;
+  return list;
 };
