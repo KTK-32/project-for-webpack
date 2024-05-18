@@ -10,8 +10,8 @@ export function Visualize2DArray (array2D: number[][]) {
       mapped = mapped + value
     });
     // mapped = mapped + "<\\div>";
-    list.push(mapped);
-    list.push(<br>);
+    list.push(<div>{mapped}</div>);
+    //list.push(<br>);
     // list.push(mapped)+list.push(<br>);
     mapped = "";
   });
