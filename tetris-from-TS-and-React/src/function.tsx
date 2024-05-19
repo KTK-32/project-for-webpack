@@ -9,10 +9,8 @@ export function Visualize2DArray (array2D: number[][]) {
     value.forEach(value => {
       mapped = mapped + value
     });
-    // mapped = mapped + "<\\div>";
-    list.push(<div>{mapped}</div>);
-    //list.push(<br>);
-    // list.push(mapped)+list.push(<br>);
+    mapped = "1" + mapped + "1\n";
+    list.push(mapped);
     mapped = "";
   });
 

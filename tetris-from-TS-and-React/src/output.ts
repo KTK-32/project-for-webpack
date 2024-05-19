@@ -10,4 +10,4 @@ export class field {
     }
 }
 
-let fld = new field
+let fld = new field;
