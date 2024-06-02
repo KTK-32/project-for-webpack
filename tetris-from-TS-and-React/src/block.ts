@@ -1,26 +1,33 @@
-interface Block {
+export interface Block {
+    origin: number[];
+    move: number[];
     entity: number[][];
-    x: number;
-    y: number;
     rotation: number;
+    locked: boolean;
+    lastmove: string;
 
     spin(): void;
+    up(): void;
     down(): void;
     left(): void;
     right(): void;
 }
 
 export class Block_T implements Block {
+    origin: number[];
+    move: number[];
     entity: number[][];
-    x: number;
-    y: number;
     rotation: number;
+    locked: boolean;
+    lastmove: string;
 
-    constructor(){
-        this.entity =[[0,1,0],[1,1,1],[0,0,0]];
-        this.x = 0;
-        this.y = 0;
+    constructor() {
+        this.origin = [0,0];
+        this.move = [0,0];
+        this.entity = [[0,1,0],[1,1,1],[0,0,0]];
         this.rotation = 0;
+        this.locked = false;
+        this.lastmove = "new";
     }
 
     spin() {
@@ -29,16 +36,33 @@ export class Block_T implements Block {
         switch (this.rotation) {
             case 0:
                 this.entity = [[0,1,0],[1,1,1],[0,0,0]];
+                break;
             case 1:
                 this.entity = [[0,1,0],[0,1,1],[0,1,0]];
+                break;
             case 2:
                 this.entity = [[0,0,0],[1,1,1],[0,1,0]];
+                break;
             case 3:
                 this.entity = [[0,1,0],[1,1,0],[0,1,0]];
-        };
-    };
+                break;
+        }
+    }
 
-    down() {this.y = this.y - 1};
-    left() {this.x = this.x - 1};
-    right() {this.x = this.x + 1};
+    up() {
+        this.move[1] = this.move[1] - 1;
+        this.lastmove = "up";
+    }
+    down() {
+        this.move[1] = this.move[1] + 1;
+        this.lastmove = "down";
+    }
+    left() {
+        this.move[0] = this.move[0] - 1;
+        this.lastmove = "left";
+    }
+    right() {
+        this.move[0] = this.move[0] + 1;
+        this.lastmove = "right";
+    }
 }
