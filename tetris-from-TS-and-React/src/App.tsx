@@ -3,15 +3,18 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Field } from './object'
-import { Visualize2DArray } from './function.tsx'
+import { VisualizeEntity } from './functions.tsx'
+import { Block_T } from "./object";
 
 function App() {
   const [count, setCount] = useState(0)
   let fld = new Field
-  let Vslfld = Visualize2DArray(fld.entity)
+  let Vslfld = VisualizeEntity(fld.entity)
+
+
   return (
     <>
-      <div style={{whiteSpace: 'pre-line'}}>{Vslfld}</div>
+      <div style={{whiteSpace: 'pre-line'}} className="game">{Vslfld}</div>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

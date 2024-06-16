@@ -1,100 +1,189 @@
-import { Generate2DArray } from "./function";
-import { Block } from "./block";
+import { GenerateEntity } from './functions';
+import { CHARS } from './consts';
+
+CHARS.FIELD
+
+interface Block {
+    origin: number[];
+    move: number[];
+    entity: string[][][];
+    rotation: number;
+    locked: boolean;
+    lastmove: string;
+
+    spin(): void;
+    up(): void;
+    down(): void;
+    left(): void;
+    right(): void;
+}
+
+export class Block_T implements Block {
+    origin: number[];
+    move: number[];
+    entity: string[][][];
+    rotation: number;
+    locked: boolean;
+    lastmove: string;
+
+    constructor() {
+        this.origin = [0,0];
+        this.move = [0,0];
+        this.entity = [[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]],[[CHARS.BLOCK],[CHARS.BLOCK],[CHARS.BLOCK]],[[CHARS.FIELD],[CHARS.FIELD],[CHARS.FIELD]]];
+        this.rotation = 0;
+        this.locked = false;
+        this.lastmove = 'new';
+    }
+
+    spin() {
+        this.rotation = this.rotation + 1;
+        if (this.rotation > 3) {this.rotation = 0};
+        switch (this.rotation) {
+            case 0:
+                this.entity = [[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]],[[CHARS.BLOCK],[CHARS.BLOCK],[CHARS.BLOCK]],[[CHARS.FIELD],[CHARS.FIELD],[CHARS.FIELD]]];
+                break;
+            case 1:
+                this.entity = [[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]],[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.BLOCK]],[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]]];
+                break;
+            case 2:
+                this.entity = [[[CHARS.FIELD],[CHARS.FIELD],[CHARS.FIELD]],[[CHARS.BLOCK],[CHARS.BLOCK],[CHARS.BLOCK]],[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]]];
+                break;
+            case 3:
+                this.entity = [[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]],[[CHARS.BLOCK],[CHARS.BLOCK],[CHARS.FIELD]],[[CHARS.FIELD],[CHARS.BLOCK],[CHARS.FIELD]]];
+                break;
+        }
+    }
+
+    up() {
+        this.move[1] = this.move[1] - 1;
+        this.lastmove = 'up';
+    }
+    down() {
+        this.move[1] = this.move[1] + 1;
+        this.lastmove = 'down';
+    }
+    left() {
+        this.move[0] = this.move[0] - 1;
+        this.lastmove = 'left';
+    }
+    right() {
+        this.move[0] = this.move[0] + 1;
+        this.lastmove = 'right';
+    }
+}
 
 export class Field {
     origin: number[];
     width: number;
     height: number;
-    loadspace: Block[];
-    entity: number[][];
+    blockmemory: Block[];
+    entity: string[][][];
 
     constructor() {
         this.origin = [4,0];
-        this.width = 10;
-        this.height = 20;
-        this.loadspace = [];
-        this.entity = Generate2DArray(this.height+2,this.width+2);
+        this.width = 12;
+        this.height = 21;
+        this.blockmemory = [];
+
+        this.entity = GenerateEntity(this.height, this.width);
         this.entity.forEach((eachRow) => {
-            eachRow[0] = 1;
-            eachRow[this.width + 2] = 1; 
+            eachRow[0][0] = CHARS.WALL;
+            eachRow[this.width - 1][0] = CHARS.WALL; 
         });
-        this.entity[this.height + 1].forEach((_, colNum, lastRow) => {
-            lastRow[colNum] = 1;
+        this.entity[this.height - 1].forEach((_, colNum, lastRow) => {
+            lastRow[colNum][0] = CHARS.BOTTOM;
         });
     }
 
     fieldInitialize() {
-        this.entity = Generate2DArray(this.height,this.width);
+        this.entity = GenerateEntity(this.height, this.width);
         this.entity.forEach((eachRow) => {
-            eachRow[0] = 1;
-            eachRow[this.width - 1] = 1; 
+            eachRow[0][0] = CHARS.WALL;
+            eachRow[this.width - 1][0] = CHARS.WALL; 
         });
         this.entity[this.height - 1].forEach((_, colNum, lastRow) => {
-            lastRow[colNum] = 1;
+            lastRow[colNum][0] = CHARS.BOTTOM;
         });
     }
 
-    checkInterference(): boolean {
-        let intf: boolean = false;
-        this.entity.forEach((eachRow) => {
-            if (eachRow.includes(2)){intf = true}
-        });
-        return intf;
-    }
-
-    checkBlockmove() {
-        if (this.checkInterference() == true){
-            const lastBlock: Block = this.loadspace[this.loadspace.length - 1];
-            switch (lastBlock.lastmove) {
-                case "up":
-                    lastBlock.down();
-                    break;
-                case "down":
-                    lastBlock.up();
-                    lastBlock.locked = true;
-                    break;
-                case "left":
-                    lastBlock.right();
-                    break;
-                case "right":
-                    lastBlock.left();
-                    break;
-                case "new":
-                    break;
-            }
+    cancelBlockmove() {
+        const lastBlock: Block = this.blockmemory[this.blockmemory.length - 1];
+        switch (lastBlock.lastmove) {
+            case 'up':
+                lastBlock.down();
+                break;
+            case 'down':
+                lastBlock.up();
+                lastBlock.locked = true;
+                break;
+            case 'left':
+                lastBlock.right();
+                break;
+            case 'right':
+                lastBlock.left();
+                break;
+            case 'new':
+                break;
         }
     }
 
-    checkClearLine() {
+    clearLineCheck(){
+        let filledRow: number[] = [];
         this.entity.forEach((eachRow,rowNum) => {
+            let isFilled: boolean = true;
             eachRow.forEach((value) => {
-                
-            })
-        })
+                if(value[0] == CHARS.FIELD){isFilled = false}
+            });
+            if (isFilled){filledRow.push(rowNum);}
+        });
+        if (filledRow.length > 0){
+            filledRow.forEach((rowNum) => {
+                this.entity[rowNum].forEach((value) => {
+                    value[0] = CHARS.FIELD;
+                });
+            });
+        }
+    }
+
+    clearBlockCheck(){
+        let notEmptyBlocksArray: Block[] = [];
+        this.blockmemory.forEach((eachBlock) => {
+            let isBlockEmpty: boolean = true;
+            eachBlock.entity.forEach((eachRow) => {
+                eachRow.forEach((value) => {
+                    if(value[0] == CHARS.BLOCK){isBlockEmpty = false;}
+                });
+            });
+            if(!isBlockEmpty){notEmptyBlocksArray.push(eachBlock);}
+        });
+        this.blockmemory = notEmptyBlocksArray;
     }
 
     loadBlock(objBlock: Block) {
-        this.loadspace.push(objBlock);
+        this.blockmemory.push(objBlock);
     }
 
     materialize() {
         this.fieldInitialize();
 
-        this.loadspace.forEach((block) => {
-            const x: number = this.origin[0] + block.origin[0] + block.move[0];
-            const y: number = this.origin[1] + block.origin[1] + block.move[1];
+        this.blockmemory.forEach((block) => {
+            const blockX: number = this.origin[0] + block.origin[0] + block.move[0];
+            const blockY: number = this.origin[1] + block.origin[1] + block.move[1];
 
             block.entity.forEach((eachRow, rowNum) => {
                 eachRow.forEach((blockValue, colNum) => {
-                    if (y + rowNum > this.entity.length - 1) return;
-                    if (x + colNum > this.entity[0].length - 1) return;
-                    const fieldValue: number = this.entity[y + rowNum][x + colNum];
-                    this.entity[y + rowNum][x + colNum] = fieldValue + blockValue;
+                    if (blockX + rowNum > this.height) return;
+                    if (blockY + colNum > this.width) return;
+                    if (this.entity[blockY + rowNum][blockX + colNum][0] = CHARS.FIELD){
+                        this.entity[blockY + rowNum][blockX + colNum]= blockValue;
+                    } else {
+                        this.cancelBlockmove();
+                    }
                 });
             });
         });
 
-        this.checkBlockmove();
-        this.checkClearLine();
+        this.clearLineCheck();
+        this.clearBlockCheck();
     }
-};
+}

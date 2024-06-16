@@ -1,12 +1,12 @@
-import { Generate2DArray } from "./function";
-import { Visualize2DArray} from "./function";
+import { GenerateEntity } from "./functions";
+import { Visualize2DArray} from "./functions";
 import { Block_T } from "./block";
 
 export class field {
     entity: number[][]
 
     constructor() {
-        this.entity = Generate2DArray(20,10)
+        this.entity = GenerateEntity(20,10)
     }
 }
 
